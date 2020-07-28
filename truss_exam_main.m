@@ -15,7 +15,7 @@ Nataf = ERANataf(distributions,corr);
 ulim = 0.12;
 gfun = @(input) ulim - truss_exam(input);
 
-%% Subset simulation
+%% Subset simulation inputs
 % threshold
 rng(1)
 
@@ -34,10 +34,12 @@ rho_val = linspace(0,1,3);
 % various p values for parameter study
 p_val = linspace(0.1,0.9,9);
 
+%% IMPORTANT: Select one of the following options by uncommenting it
 %run_type = 'primary';   %estimates PoF and CoV of bridge
 %run_type = 'p_study';  %studies convergence and variability as p varies
 run_type = 'rho_study'; %studies convergence and variability as rho varies
 
+%% Run subset simulation according to run type selected
 switch run_type
     case 'primary'
         disp('primary was selected')
@@ -121,41 +123,3 @@ switch run_type
         error('please enter a valid run type: either "primary", "p_study", or "rho_study" ');
 end
 
-
-%% Post processing
-
-
-
-% plots average PoF vs. the intermediate failure levels, as well as the
-% final PoF corresponding to gamma=0
-
-
-%figure
-%semilogy(rho_val,mean(Q_SuS,1))
-% semilogy(p_val,mean(Q_SuS,1))
-% title('Q estimate vs p0')
-% xlabel('p0')
-% ylabel('Q')
-% 
-% figure
-% plot(p_val,std(Q_SuS,1)./mean(Q_SuS,1))
-% title('variance vs p0')
-% xlabel('p0')
-% ylabel('variance')
-
-
-%gamma_avg = mean(gamma_t,1);
-%gamma_avg = reshape(gamma_avg,[8,8]);
-
-% conv_steps = zeros(10,1);
-% for i=1:size(p_val,2)
-%     indices = gamma_t(i,:)==0;
-%     
-%     conv_steps(i) = sum(indices==0) + 1;
-% end
-%     
-% figure
-% plot(p_val,conv_steps,'-o')
-% title('steps to convergence, \rho = 0.8')
-% xlabel('p0')
-% ylabel('steps to convergence')
