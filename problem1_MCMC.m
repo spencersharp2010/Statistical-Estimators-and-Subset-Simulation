@@ -34,7 +34,7 @@ rng(1,'twister');
 %for i=1:length(sigma)
     
 x=zeros(burn+N+1,2);
-x(1,:)=[15,10];
+x(1,:)=[5,10];
 
 % Candidate sample
 sigma_mat = eye(2)*sigma;
@@ -69,28 +69,28 @@ for k=1:N
 end
 
 I = g_eval >= 0;
-Q = sum(I)/N;
+Q = sum(I)/N
 Var_Pr=var(I)/N;
 
 
-% figure;
-% plot(x_fin(:,1))
-% title('x1')
-% figure;
-% plot(x_fin(:,2))
-% title('x2');
-% figure;
-% scatter(x_fin(:,1),x_fin(:,2))
+%figure;
+%plot(x_fin(:,1))
+%title('x1')
+%figure;
+%plot(x_fin(:,2))
+%title('x2');
+figure;
+scatter(x(:,1),x(:,2))
 % Mean of the estimator
 %Q=mean(x_fin,);
 
 
 % Coefficient of variation of the estimator
 % estimate the coefficient of variation of Q
-nlags = 200;
-acf_Y = autocorr(g_eval,nlags);
-gamma = 2*sum((1-(1:nlags)/(length(g_eval)))'.*acf_Y(2:end));
-Var_Q = var(g_eval)/N*(1+gamma);
+nlags = 50;
+acf_Y = autocorr(I',nlags);
+gamma = 2*sum((1-(1:nlags)/(length(I)))'.*acf_Y(2:end));
+Var_Q = var(I)/N*(1+gamma);
 delta_Q=sqrt(Var_Q)/Q
 % 
 % plot(acf_x)
