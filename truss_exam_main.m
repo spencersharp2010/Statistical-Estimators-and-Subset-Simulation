@@ -17,7 +17,7 @@ gfun = @(input) ulim - truss_exam(input);
 
 %% Subset simulation inputs
 % threshold
-rng(1)
+rng(1,'twister')
 
 % Sample size
 N_lev=2e3;
@@ -35,15 +35,15 @@ rho_val = linspace(0,1,3);
 p_val = linspace(0.1,0.9,9);
 
 %% IMPORTANT: Select one of the following options by uncommenting it
-%run_type = 'primary';   %estimates PoF and CoV of bridge
+run_type = 'primary';   %estimates PoF and CoV of bridge
 %run_type = 'p_study';  %studies convergence and variability as p varies
-run_type = 'rho_study'; %studies convergence and variability as rho varies
+%run_type = 'rho_study'; %studies convergence and variability as rho varies
 
 %% Run subset simulation according to run type selected
 switch run_type
     case 'primary'
         disp('primary was selected')
-        num_iter = 5;
+        num_iter = 1;
         for iter = 1:num_iter
             fprintf('iteration %d of %d \n',iter,num_iter);
             [Q_SuS(iter),gamma_t(iter,:),T] = subsetSim(N_lev, p, rho, gfun, Nataf);

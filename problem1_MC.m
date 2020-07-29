@@ -31,7 +31,11 @@ for i=1:max_iter
     delta_Q(i)=sqrt(Var_Pr(i))/Q(i);
 end
 
-
+figure;
+scatter(x1,x2);
+title('x_1 and x_2 sampled using inverse transform')
+xlabel('x_1')
+ylabel('x_2')
 % below are two methods of estimating the coefficient of variation
 c_v1 = mean(delta_Q)
 c_v2 = std(Q) / mean(Q)
