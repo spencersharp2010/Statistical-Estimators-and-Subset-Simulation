@@ -2,18 +2,20 @@ function [Q_SuS,gamma_t,T] = subsetSim(N_lev, p, rho, g_fun, distribution)
 %SUBSETSIM computes PoF of given random variables against given limit state
 %function
 
-n_dim   = length(distribution.Marginals);
+% define number of dimensions based on number of marginal distributions
+n_dim = length(distribution.Marginals);
 
 % Generate samples at first level
 % samples at standard normal space
 u_sam = normrnd(0,1,n_dim,N_lev);
 
-% samples at original space
+% samples in original space
 x_sam = distribution.U2X(u_sam)';
 
 % Evaluate the responses
 g_sam = g_fun(x_sam);
 
+% threshold of our limit state function
 gamma = 0;
 
 % maximum number of subsets/levels
@@ -42,9 +44,8 @@ for t = 1:maxT
     N_chain = floor(N_lev/N_seed)*ones(N_seed,1);
     N_chain(1:mod(N_lev,N_seed)) = N_chain(1:mod(N_lev,N_seed))+1;
 
-    % MCMC sampling
+    % MCMC sampling (Metropolis Hastings algorithm)
     count = 0;
-    %rho = rho_val(k);
     for i = 1:N_seed
 
         count = count+1;
@@ -77,8 +78,6 @@ for t = 1:maxT
         end %chains
 
     end %seeds
-
-
 
 end %subset levels
 

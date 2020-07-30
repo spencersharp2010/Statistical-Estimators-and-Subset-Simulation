@@ -1,5 +1,4 @@
 clear;
-
 %% setup
 % define N such that coeff of variation is roughly 5%
 N = 2e4;

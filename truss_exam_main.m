@@ -29,21 +29,21 @@ p = 0.1;
 rho = 0.8;
 
 % various rho values for parameter study
-rho_val = linspace(0,1,3);
+rho_val = linspace(0,1,5);
 
 % various p values for parameter study
 p_val = linspace(0.1,0.9,9);
 
 %% IMPORTANT: Select one of the following options by uncommenting it
-run_type = 'primary';   %estimates PoF and CoV of bridge
+%run_type = 'primary';   %estimates PoF and CoV of bridge
 %run_type = 'p_study';  %studies convergence and variability as p varies
-%run_type = 'rho_study'; %studies convergence and variability as rho varies
+run_type = 'rho_study'; %studies convergence and variability as rho varies
 
 %% Run subset simulation according to run type selected
 switch run_type
     case 'primary'
         disp('primary was selected')
-        num_iter = 1;
+        num_iter = 20;
         for iter = 1:num_iter
             fprintf('iteration %d of %d \n',iter,num_iter);
             [Q_SuS(iter),gamma_t(iter,:),T] = subsetSim(N_lev, p, rho, gfun, Nataf);
@@ -60,52 +60,66 @@ switch run_type
            Pf(i)        = Pf(i-1)*p;
         end
         
+        % plot PoF vs intermediate thresholds
         figure
-        semilogy(mean(gamma_t(:,1:end-1),1), Pf,'ro', 'MarkerSize',6);   % points
+        semilogy(mean(gamma_t(:,1:end-1),1), Pf,'ro', 'MarkerSize',8);   % points
         title("PoF vs \gamma, p = " + p + ", \rho = " + rho + ", " + num_iter + " iterations")
         xlabel('\gamma')
         ylabel('PoF')
         grid
         hold on;
-        semilogy(0, mean(Q_SuS), 'b*', 'MarkerSize',6);
-        %set(gca,'yscale','log'); axis tight;
+        % add final PoF value at gamma=0
+        semilogy(0, mean(Q_SuS), 'b*', 'MarkerSize',8);
         hl = legend('Intermediate levels','PoF', 'Location', 'southeast');
-        %set(hl,'Interpreter','latex'); set(gca,'FontSize',14);
+        set(hl,'Interpreter','latex'); 
+        set(gca,'FontSize',14);
 
     case 'p_study'
         disp('p_study was selected')
+        
+        % calculate PoF for various p values
         for iter = 1:length(p_val)
             fprintf('iteration %d of %d \n',iter,length(p_val));
             [Q_SuS(iter),gamma_t{iter},T] = subsetSim(N_lev, p_val(iter), rho, gfun, Nataf);
         end
+        
+        % calculate number of steps to convergence vs p value
         conv_steps = zeros(length(p_val),1);
         for i=1:length(p_val)
             conv_steps(i) = length(gamma_t{i});
         end
         
+        % plot # of steps to convergence vs p value
         figure
         plot(p_val,conv_steps,'-o')
         title("steps to convergence vs p, \rho = " + rho)
         xlabel('p')
         ylabel('steps to convergence')
+        grid
         
+        % plot calculated PoF vs p value
         figure
         plot(p_val,Q_SuS,'-o')
         title("PoF vs p, \rho = " + rho)
         xlabel('p')
         ylabel('PoF')
-        
+        grid
+             
     case 'rho_study'
         disp('rho_study was selected')
+        
+        % calculate PoF for various rho values
         for iter = 1:length(rho_val)
             fprintf('iteration %d of %d \n',iter,length(rho_val));
-            [Q_SuS(iter),gamma_t{iter},T] = subsetSim(N_lev, p, rho_val(iter), gfun, Nataf);
+            [Q_SuS(i,iter),gamma_t{iter},T] = subsetSim(N_lev, p, rho_val(iter), gfun, Nataf);
         end
+        % calculate number of steps to convergence
         conv_steps = zeros(length(rho_val),1);
         for i=1:length(rho_val)
             conv_steps(i) = length(gamma_t{i});
         end
         
+        % plot # of steps to convergence vs p value
         figure
         plot(rho_val,conv_steps,'-o')
         title("steps to convergence vs \rho, p = " + p)
@@ -113,6 +127,7 @@ switch run_type
         ylabel('steps to convergence')
         grid
         
+        % plot calculated PoF vs p value
         figure
         plot(rho_val,Q_SuS,'-o')
         title("PoF vs \rho, p = " + p)
