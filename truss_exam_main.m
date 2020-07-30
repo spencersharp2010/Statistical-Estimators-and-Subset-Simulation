@@ -1,23 +1,29 @@
 clear;
 %% Setup
+% define distributions as described in exam sheet
 distributions(1) = ERADist('lognormal','MOM',[2e-3,2e-4]);
 distributions(2) = ERADist('lognormal','MOM',[1e-3,1e-4]);
 distributions(3:4) = ERADist('lognormal','MOM',[2.1e11,2.1e10]);
 distributions(5:10) = ERADist('gumbel','MOM',[5e4,7.5e3]);
 
+% ten random variables, so we have ten dimensional problem
 dim = 10;
+
+% define correlation. Identity matrix since distributions are independent
 corr = eye(dim);
+
+% define instance of ERANataf class to be able to transform samples in
+% standard normal space back to physical space
 Nataf = ERANataf(distributions,corr);
 
 %% Limit state function
-% limit state function
-%gfun=@(r,s)s-r;
+% note that with this definition, gfun<=0 means failure
 ulim = 0.12;
 gfun = @(input) ulim - truss_exam(input);
 
 %% Subset simulation inputs
 % threshold
-rng(1,'twister')
+rng(1)
 
 % Sample size
 N_lev=2e3;
@@ -29,21 +35,21 @@ p = 0.1;
 rho = 0.8;
 
 % various rho values for parameter study
-rho_val = linspace(0,1,5);
+rho_val = linspace(0,1,11);
 
 % various p values for parameter study
 p_val = linspace(0.1,0.9,9);
 
 %% IMPORTANT: Select one of the following options by uncommenting it
-%run_type = 'primary';   %estimates PoF and CoV of bridge
+run_type = 'primary';   %estimates PoF and CoV of bridge
 %run_type = 'p_study';  %studies convergence and variability as p varies
-run_type = 'rho_study'; %studies convergence and variability as rho varies
+%run_type = 'rho_study'; %studies convergence and variability as rho varies
 
 %% Run subset simulation according to run type selected
 switch run_type
     case 'primary'
         disp('primary was selected')
-        num_iter = 20;
+        num_iter = 10;
         for iter = 1:num_iter
             fprintf('iteration %d of %d \n',iter,num_iter);
             [Q_SuS(iter),gamma_t(iter,:),T] = subsetSim(N_lev, p, rho, gfun, Nataf);
@@ -79,8 +85,9 @@ switch run_type
         
         % calculate PoF for various p values
         for iter = 1:length(p_val)
-            fprintf('iteration %d of %d \n',iter,length(p_val));
+            fprintf('iteration %d of %d, p = %.1f \n',iter,length(p_val), p_val(iter));
             [Q_SuS(iter),gamma_t{iter},T] = subsetSim(N_lev, p_val(iter), rho, gfun, Nataf);
+            fprintf('\tP(u_max(X)>=u_lim) = %4.6f \n',Q_SuS(iter));
         end
         
         % calculate number of steps to convergence vs p value
@@ -110,8 +117,9 @@ switch run_type
         
         % calculate PoF for various rho values
         for iter = 1:length(rho_val)
-            fprintf('iteration %d of %d \n',iter,length(rho_val));
-            [Q_SuS(i,iter),gamma_t{iter},T] = subsetSim(N_lev, p, rho_val(iter), gfun, Nataf);
+            fprintf('iteration %d of %d, rho = %.1f \n',iter,length(rho_val), rho_val(iter));
+            [Q_SuS(iter),gamma_t{iter},T] = subsetSim(N_lev, p, rho_val(iter), gfun, Nataf);
+            fprintf('\tP(u_max(X)>=u_lim) = %4.6f \n',Q_SuS(iter));
         end
         % calculate number of steps to convergence
         conv_steps = zeros(length(rho_val),1);
@@ -134,6 +142,7 @@ switch run_type
         xlabel('\rho')
         ylabel('PoF')
         grid
+        
     otherwise
         error('please enter a valid run type: either "primary", "p_study", or "rho_study" ');
 end

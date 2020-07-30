@@ -13,31 +13,35 @@ burn=1000;
 % Sample size - same as MC portion of problem 1
 N=2e4;
 
-% % Seed value
-% rng(1);
-
 %% IMPORTANT: Select one of the following options by uncommenting it
-%sigma_val=[2 5 10];
-sigma_val = 5;
+sigma_val=[2 5 10];
+%sigma_val = 5;
 
 %% MCMC - random walk sampler
+% loop across each value of sigma specified
 for iter=1:length(sigma_val)
     % Seed value
     rng(1);
     
     fprintf('sigma = %.1f\n',sigma_val(iter));
+    
+    % space for x
     x=zeros(burn+N+1,2);
+    
+    % set initial value of x
     x(1,:)=[15,10];
 
-    % Candidate sample
-    sigma_mat = eye(2)*sigma_val(iter);
+    % Candidate sample (normrnd and mvn give different results - I think
+    % normrnd looks more correct so that's what I use)
+    
+    %sigma_mat = eye(2)*sigma_val(iter);
     %x_cand = mvnrnd([0,0],sigma_mat,burn+N);
     x_cand = normrnd(0,sigma_val(iter),burn+N,2);
     
-    % Uniform sample
+    % Uniform sample for comparison
     u=rand(burn+N,1);
 
-    % MCMC algorithm
+    % MCMC algorithm - loop across all samples
     for j=1:burn+N
 
         % Generate proposal state of the Markov chain
@@ -107,7 +111,6 @@ for i=1:length(sigma_val)
     [acf,Lags] = autocorr(x1_graph(:,i),50);
     plot(Lags,acf);
     legendinfo{i}=['\sigma = ', num2str(sigma_val(i))];
-    %hold on;
 end
 title('x_1 sample correlation')
 xlabel('Lag')
@@ -115,14 +118,13 @@ ylabel('Sample Autocorrelation')
 legend(legendinfo)
 hold off;
 
-% plot autocorrelation of x2 samples using 
+% plot autocorrelation of x2 samples 
 figure
 hold on;
 for i=1:length(sigma_val)
     [acf,Lags] = autocorr(x2_graph(:,i),50);
     plot(Lags,acf);
     legendinfo{i}=['\sigma = ', num2str(sigma_val(i))];
-    %hold on;
 end
 title('x_2 sample correlation')
 xlabel('Lag')
