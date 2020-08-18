@@ -49,7 +49,7 @@ run_type = 'primary';   %estimates PoF and CoV of bridge
 switch run_type
     case 'primary'
         disp('primary was selected')
-        num_iter = 10;
+        num_iter = 5;
         for iter = 1:num_iter
             fprintf('iteration %d of %d \n',iter,num_iter);
             [Q_SuS(iter),gamma_t(iter,:),T] = subsetSim(N_lev, p, rho, gfun, Nataf);
