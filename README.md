@@ -1,5 +1,5 @@
 # Statistical Estimators
-I developed these files for the class *Rare Events and Failure Probabilities* at the Technical University of Munich.
+I developed these files for the class *Estimation of Rare Events and Failure Probabilities* at the Technical University of Munich.
 
 ## Monte Carlo estimator using inverse transform
 A function, *g*, of two random variables was given. In addition, the CDF of each random variable was provided. Using this information, I derived the marginal PDFs, as well as the 
